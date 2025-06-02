@@ -27,6 +27,24 @@ public class HonorTile : ATile
     }
 
     public HonorType Type { private set; get; }
+
+    public static bool operator ==(HonorTile a, HonorTile b)
+        => a.Type == b.Type;
+
+    public static bool operator !=(HonorTile a, HonorTile b)
+        => !(a == b);
+
+    public override bool Equals(object? o)
+    {
+        if (o is null) return false;
+        if (o is not HonorTile tile) return false;
+        return tile == this;
+    }
+
+    public override int GetHashCode()
+    {
+        return Type.GetHashCode();
+    }
 }
 
 public enum HonorType

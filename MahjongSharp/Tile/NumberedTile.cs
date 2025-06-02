@@ -18,6 +18,24 @@ public class NumberedTile : ATile
 
     public int Number { private set; get; }
     public NumberedTileType Type { private set; get; }
+
+    public static bool operator ==(NumberedTile a, NumberedTile b)
+        => a.Type == b.Type && a.Number == b.Number;
+
+    public static bool operator !=(NumberedTile a, NumberedTile b)
+        => !(a == b);
+
+    public override bool Equals(object? o)
+    {
+        if (o is null) return false;
+        if (o is not NumberedTile tile) return false;
+        return tile == this;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Type, Number);
+    }
 }
 
 public enum NumberedTileType

@@ -20,6 +20,6 @@ public class GameClient
     {
         var wall = new Wall(ruleset, rand);
 
-        _players = Enumerable.Range(0, 4).Select(x => new PlayerHand(wall.GetTiles(ruleset.HandSize).ToList()));
+        _players = Enumerable.Range(0, playerCount).Select(x => new PlayerHand(wall.GetTiles(ruleset.HandSize).ToList()));
     }
 }
