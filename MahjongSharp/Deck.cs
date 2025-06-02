@@ -1,34 +1,29 @@
+using MahjongSharp.Player;
+using MahjongSharp.Ruleset;
 using MahjongSharp.Tile;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace MahjongSharp;
 
-public class DeckManager
+public class Deck
 {
-    private readonly List<ATile> _tiles = new();
+    // All tiles we can still draw
+    private IList<ATile> _tiles;
+    // Tiles in the dead wall
+    private IList<ATile> _deadWall;
 
-    public DeckManager()
+    // Current players
+    private IEnumerable<PlayerHand> _players;
+
+    private Random _rand;
+
+    public Deck(ARuleset ruleset, int playerCount, Random? rand = null)
     {
-        for (int c = 0; c < 4; c++)
-        {
-            // Numbered tiles
-            for (int i = 1; i <= 9; i++)
-            {
-                foreach (var type in Enum.GetValues(typeof(NumberedTileType)).Cast<NumberedTileType>())
-                {
-                    _tiles.Add(new NumberedTile(i, type, i == 5 && c == 0));
-                }
-            }
+        _rand = rand ?? new Random();
 
-                // Honor tiles
-            foreach (var type in Enum.GetValues(typeof(HonorType)).Cast<HonorType>())
-            {
-                _tiles.Add(new HonorTile(type, false));
-            }
-        }
+        var tiles = ruleset.GetAllTiles().OrderBy(x => _rand.NextSingle());
 
-        // Shuffle deck
-        //_tiles = _tiles.OrderBy(_ => Random.value).ToList();
+        _players = Enumerable.Range(0, 4).Select(x => new PlayerHand(tiles.Skip(ruleset.HandSize * x).Take(ruleset.HandSize).ToList()));
+        _deadWall = tiles.Skip(playerCount * ruleset.HandSize).Take(ruleset.DeadWallSize).ToList();
+        _tiles = tiles.Skip(playerCount * ruleset.HandSize + ruleset.DeadWallSize).ToList();
     }
 }
