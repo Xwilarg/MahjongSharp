@@ -6,23 +6,32 @@ public class TileCallTests
 {
     private static ATile[] _hand1 =
     [
-        new NumberedTile(1, NumberedTileType.Bamboo, false),
-        new NumberedTile(1, NumberedTileType.Bamboo, false),
+        new HonorTile(HonorType.EastWind),
+        new HonorTile(HonorType.EastWind),
         new NumberedTile(4, NumberedTileType.Circle, false),
         new NumberedTile(5, NumberedTileType.Circle, false),
         new NumberedTile(5, NumberedTileType.Circle, false),
-        new NumberedTile(5, NumberedTileType.Circle, false)
+        new NumberedTile(5, NumberedTileType.Circle, true),
+        new NumberedTile(6, NumberedTileType.Bamboo, false),
+        new NumberedTile(8, NumberedTileType.Bamboo, false)
     ];
 
+    public static object[] ChiiHands =
+    {
+        new object[] { _hand1, new HonorTile(HonorType.EastWind), false },
+        new object[] { _hand1, new NumberedTile(3, NumberedTileType.Circle, false), true },
+        new object[] { _hand1, new NumberedTile(6, NumberedTileType.Circle, false), true },
+        new object[] { _hand1, new NumberedTile(7, NumberedTileType.Bamboo, false), true }
+    };
     public static object[] PonHands =
     {
-        new object[] { _hand1, new NumberedTile(1, NumberedTileType.Bamboo, false), true },
+        new object[] { _hand1, new HonorTile(HonorType.EastWind), true },
         new object[] { _hand1, new NumberedTile(1, NumberedTileType.Kanji, false), false },
         new object[] { _hand1, new NumberedTile(5, NumberedTileType.Circle, false), true }
     };
     public static object[] KanHands =
     {
-        new object[] { _hand1, new NumberedTile(1, NumberedTileType.Bamboo, false), false },
+        new object[] { _hand1, new HonorTile(HonorType.EastWind), false },
         new object[] { _hand1, new NumberedTile(1, NumberedTileType.Kanji, false), false },
         new object[] { _hand1, new NumberedTile(5, NumberedTileType.Circle, false), true }
     };
