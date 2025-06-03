@@ -21,10 +21,14 @@ public class NumberedTile : ATile
     public NumberedTileType Type { private set; get; }
     private bool _isAkaDora;
 
-    public static bool operator ==(NumberedTile a, NumberedTile b)
-        => a.Type == b.Type && a.Number == b.Number;
+    public static bool operator ==(NumberedTile? a, NumberedTile? b)
+    {
+        if (a is null) return b is null;
+        if (b is null) return false;
+        return a.Type == b.Type && a.Number == b.Number;
+    }
 
-    public static bool operator !=(NumberedTile a, NumberedTile b)
+    public static bool operator !=(NumberedTile? a, NumberedTile? b)
         => !(a == b);
 
     public override bool Equals(object? o)

@@ -26,10 +26,14 @@ public class HonorTile : ATile
 
     public HonorType Type { private set; get; }
 
-    public static bool operator ==(HonorTile a, HonorTile b)
-        => a.Type == b.Type;
+    public static bool operator ==(HonorTile? a, HonorTile? b)
+    {
+        if (a is null) return b is null;
+        if (b is null) return false;
+        return a.Type == b.Type;
+    }
 
-    public static bool operator !=(HonorTile a, HonorTile b)
+    public static bool operator !=(HonorTile? a, HonorTile? b)
         => !(a == b);
 
     public override bool Equals(object? o)
