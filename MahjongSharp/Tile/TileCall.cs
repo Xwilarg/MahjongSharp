@@ -2,13 +2,13 @@ namespace MahjongSharp.Tile;
 
 public static class TileCall
 {
-    public static IEnumerable<TileGroup> CanKan(IEnumerable<ATile> tiles, ATile with)
+    public static IEnumerable<TileGroup> GetKan(IEnumerable<ATile> tiles, ATile with)
     {
         var possibles = tiles.Where(x => x == with).ToArray();
         if (possibles.Length == 3) yield return new() { Tiles = [with, .. possibles] };
     }
 
-    public static IEnumerable<TileGroup> CanKan(IEnumerable<ATile> tiles)
+    public static IEnumerable<TileGroup> GetKan(IEnumerable<ATile> tiles)
     {
         foreach (var t in tiles.GroupBy(x => x))
         {
