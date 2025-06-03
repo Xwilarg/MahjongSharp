@@ -17,6 +17,56 @@ public class NumberedTile : ATile
         return numTile.Number == Number + 1;
     }
 
+    public override string GetUnicode()
+    {
+        return Type switch
+        {
+            NumberedTileType.Bamboo =>
+                Number switch
+                {
+                    1 => "🀐",
+                    2 => "🀑",
+                    3 => "🀒",
+                    4 => "🀓",
+                    5 => "🀔",
+                    6 => "🀕",
+                    7 => "🀖",
+                    8 => "🀗",
+                    9 => "🀘",
+                    _ => string.Empty
+                },
+            NumberedTileType.Circle =>
+                Number switch
+                {
+                    1 => "🀙",
+                    2 => "🀚",
+                    3 => "🀛",
+                    4 => "🀜",
+                    5 => "🀝",
+                    6 => "🀞",
+                    7 => "🀟",
+                    8 => "🀠",
+                    9 => "🀡",
+                    _ => string.Empty
+                },
+            NumberedTileType.Kanji =>
+                Number switch
+                {
+                    1 => "🀇",
+                    2 => "🀈",
+                    3 => "🀉",
+                    4 => "🀊",
+                    5 => "🀋",
+                    6 => "🀌",
+                    7 => "🀍",
+                    8 => "🀎",
+                    9 => "🀏",
+                    _ => string.Empty
+                },
+            _ => string.Empty
+        };
+    }
+
     public int Number { private set; get; }
     public NumberedTileType Type { private set; get; }
     private bool _isAkaDora;

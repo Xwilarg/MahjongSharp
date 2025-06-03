@@ -24,6 +24,21 @@ public class HonorTile : ATile
         };
     }
 
+    public override string GetUnicode()
+    {
+        return Type switch
+        {
+            HonorType.GreenDragon => "🀅",
+            HonorType.WhiteDragon => "🀆",
+            HonorType.RedDragon => "🀄",
+            HonorType.NorthWind => "🀃",
+            HonorType.WestWind => "🀂",
+            HonorType.SouthWind => "🀁",
+            HonorType.EastWind => "🀀",
+            _ => string.Empty
+        };
+    }
+
     public HonorType Type { private set; get; }
 
     public static bool operator ==(HonorTile? a, HonorTile? b)

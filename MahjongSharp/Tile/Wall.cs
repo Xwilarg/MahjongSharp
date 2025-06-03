@@ -27,12 +27,20 @@ public class Wall
         }
     }
 
+    /// <summary>
+    /// Look at the next tile in the wall without removing it, return null if there is none
+    /// </summary>
+    public ATile? PeekNextTile()
+    {
+        return _wall.TryPeek(out var tile) ? tile : null;
+    }
+
+    /// <summary>
+    /// Get the next tile in the wall, null if none
+    /// </summary>
+    /// <returns></returns>
     public ATile? GetTile()
     {
-        if (_wall.TryDequeue(out var tile))
-        {
-            return tile;
-        }
-        return null;
+        return _wall.TryDequeue(out var tile) ? tile : null;
     }
 }
