@@ -23,7 +23,7 @@ public class RiichiRuleset : ARuleset
                 // Honor tiles
             foreach (var type in Enum.GetValues(typeof(HonorType)).Cast<HonorType>())
             {
-                yield return new HonorTile(type, false);
+                yield return new HonorTile(type);
             }
         }
     }

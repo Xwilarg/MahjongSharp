@@ -2,10 +2,11 @@ namespace MahjongSharp.Tile;
 
 public class NumberedTile : ATile
 {
-    public NumberedTile(int number, NumberedTileType type, bool isAkaDora) : base(isAkaDora)
+    public NumberedTile(int number, NumberedTileType type, bool isAkaDora)
     {
         Number = number;
         Type = type;
+        _isAkaDora = isAkaDora;
     }
 
     public override bool IsDora(ATile tile)
@@ -18,6 +19,7 @@ public class NumberedTile : ATile
 
     public int Number { private set; get; }
     public NumberedTileType Type { private set; get; }
+    private bool _isAkaDora;
 
     public static bool operator ==(NumberedTile a, NumberedTile b)
         => a.Type == b.Type && a.Number == b.Number;

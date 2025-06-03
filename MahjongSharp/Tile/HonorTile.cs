@@ -1,10 +1,8 @@
-using System;
-
 namespace MahjongSharp.Tile;
 
 public class HonorTile : ATile
 {
-    public HonorTile(HonorType type, bool isAkaDora) : base(isAkaDora)
+    public HonorTile(HonorType type)
     {
         Type = type;
     }
