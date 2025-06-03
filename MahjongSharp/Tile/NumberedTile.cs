@@ -22,7 +22,7 @@ public class NumberedTile : ATile
     private bool _isAkaDora;
 
     public static bool operator ==(NumberedTile a, NumberedTile b)
-        => a.Type == b.Type && a.Number == b.Number;
+        => a.Type == b.Type;
 
     public static bool operator !=(NumberedTile a, NumberedTile b)
         => !(a == b);

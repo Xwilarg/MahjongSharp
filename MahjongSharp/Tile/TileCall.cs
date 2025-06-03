@@ -23,12 +23,11 @@ public static class TileCall
     {
         var possibles = tiles.Where(x => x == with).ToArray();
 
-        Console.WriteLine($"{possibles.Length}");
         if (possibles.Length < 2) yield break; // Not enough matches
 
-        for (int i = 0; i < possibles.Length - 1; i++)
+        for (int i = 0; i < possibles.Length; i++)
         {
-            for (int y = i + 1; y < possibles.Length - 1; y++)
+            for (int y = i + 1; y < possibles.Length; y++)
             {
                 yield return new() { Tiles = [with, possibles[i], possibles[y]] };
             }
