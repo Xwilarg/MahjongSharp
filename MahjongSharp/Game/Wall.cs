@@ -1,6 +1,7 @@
 using MahjongSharp.Ruleset;
+using MahjongSharp.Tile;
 
-namespace MahjongSharp.Tile;
+namespace MahjongSharp.Game;
 
 public class Wall
 {

@@ -21,9 +21,13 @@ public class RiichiRuleset : ARuleset
             }
 
             // Honor tiles
-            foreach (var type in Enum.GetValues(typeof(HonorType)).Cast<HonorType>())
+            foreach (var type in Enum.GetValues(typeof(WindType)).Cast<WindType>())
             {
-                yield return new HonorTile(type);
+                yield return new WindTile(type);
+            }
+            foreach (var type in Enum.GetValues(typeof(DragonType)).Cast<DragonType>())
+            {
+                yield return new DragonTile(type);
             }
         }
     }

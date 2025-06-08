@@ -13,9 +13,9 @@ public class AllGreenYaku : AYaku
                 {
                     return numTile.Number == 2 || numTile.Number == 3 || numTile.Number == 4 || numTile.Number == 6 || numTile.Number == 8;
                 }
-                else if (x is HonorTile honor)
+                else if (x is DragonTile honor)
                 {
-                    return honor.Type == HonorType.GreenDragon;
+                    return honor.Type == DragonType.Green;
                 }
                 return false;
             }

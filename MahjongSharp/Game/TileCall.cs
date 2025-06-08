@@ -1,4 +1,6 @@
-namespace MahjongSharp.Tile;
+using MahjongSharp.Tile;
+
+namespace MahjongSharp.Game;
 
 public static class TileCall
 {
