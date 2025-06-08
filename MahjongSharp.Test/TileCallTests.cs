@@ -57,4 +57,23 @@ public class TileCallTests
         var res = TileCall.GetKan([with, ..hand]);
         Assert.That(res, doesMatch ? Is.Not.Empty : Is.Empty);
     }
+
+    [Test]
+    public void TestSortHand()
+    {
+        var hand = new PlayerHand(_hand1);
+
+        hand.SortHand();
+
+        Assert.That(hand.Tiles, Is.EquivalentTo(new ATile[] {
+            new NumberedTile(6, NumberedTileType.Bamboo, false),
+            new NumberedTile(8, NumberedTileType.Bamboo, false),
+            new NumberedTile(4, NumberedTileType.Circle, false),
+            new NumberedTile(5, NumberedTileType.Circle, false),
+            new NumberedTile(5, NumberedTileType.Circle, false),
+            new NumberedTile(5, NumberedTileType.Circle, true),
+            new WindTile(WindType.East),
+            new WindTile(WindType.East),
+        }));
+    }
 }
