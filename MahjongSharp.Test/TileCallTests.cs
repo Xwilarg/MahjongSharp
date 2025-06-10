@@ -59,6 +59,16 @@ public class TileCallTests
     }
 
     [Test]
+    public void TestTextNotation()
+    {
+        var hand = new PlayerHand(_hand1);
+
+        hand.SortHand();
+
+        Assert.That(hand.GetTextNotation(), Is.EqualTo("68s4555p11z"));
+    }
+
+    [Test]
     public void TestSortHand()
     {
         var hand = new PlayerHand(_hand1);
