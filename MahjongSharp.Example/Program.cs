@@ -1,6 +1,5 @@
 using MahjongSharp.Game;
 using MahjongSharp.Ruleset;
-using MahjongSharp.Tile;
 
 // For this example, we are using riichi mahjong
 var ruleset = new RiichiRuleset();

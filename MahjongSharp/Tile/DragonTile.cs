@@ -1,6 +1,8 @@
-﻿namespace MahjongSharp.Tile;
+﻿using static System.Runtime.InteropServices.JavaScript.JSType;
 
-public class DragonTile : AHonorTile<DragonType>
+namespace MahjongSharp.Tile;
+
+public record DragonTile : AHonorTile<DragonType>
 {
     public DragonTile(DragonType type) : base(type)
     { }
@@ -29,27 +31,10 @@ public class DragonTile : AHonorTile<DragonType>
         };
     }
 
-    public static bool operator ==(DragonTile? a, DragonTile? b)
-    {
-        if (a is null) return b is null;
-        if (b is null) return false;
-        return a.Type == b.Type;
-    }
+    public override bool IsSimilarTo(ATile? b)
+        => b is DragonTile bTile && bTile != null && bTile.Type == Type;
 
-    public static bool operator !=(DragonTile? a, DragonTile? b)
-        => !(a == b);
-
-    public override bool Equals(object? o)
-    {
-        if (o is null) return false;
-        if (o is not DragonTile tile) return false;
-        return tile == this;
-    }
-
-    public override int GetHashCode()
-    {
-        return Type.GetHashCode();
-    }
+    public override int SimilarHashCode => HashCode.Combine(Type);
 }
 
 public enum DragonType

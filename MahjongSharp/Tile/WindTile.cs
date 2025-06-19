@@ -1,6 +1,6 @@
 ﻿namespace MahjongSharp.Tile;
 
-public class WindTile : AHonorTile<WindType>
+public record WindTile : AHonorTile<WindType>
 {
     public WindTile(WindType type) : base(type)
     { }
@@ -31,27 +31,10 @@ public class WindTile : AHonorTile<WindType>
         };
     }
 
-    public static bool operator ==(WindTile? a, WindTile? b)
-    {
-        if (a is null) return b is null;
-        if (b is null) return false;
-        return a.Type == b.Type;
-    }
+    public override bool IsSimilarTo(ATile? b)
+        => b is WindTile bTile && bTile != null && bTile.Type == Type;
 
-    public static bool operator !=(WindTile? a, WindTile? b)
-        => !(a == b);
-
-    public override bool Equals(object? o)
-    {
-        if (o is null) return false;
-        if (o is not WindTile tile) return false;
-        return tile == this;
-    }
-
-    public override int GetHashCode()
-    {
-        return Type.GetHashCode();
-    }
+    public override int SimilarHashCode => HashCode.Combine(Type);
 }
 
 public enum WindType

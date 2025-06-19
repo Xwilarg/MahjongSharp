@@ -6,13 +6,13 @@ public static class TileCall
 {
     public static IEnumerable<TileGroup> GetKan(IEnumerable<ATile> tiles, ATile with)
     {
-        var possibles = tiles.Where(x => x == with).ToArray();
+        var possibles = tiles.Where(x => x.IsSimilarTo(with)).ToArray();
         if (possibles.Length == 3) yield return new() { Tiles = [with, .. possibles] };
     }
 
     public static IEnumerable<TileGroup> GetKan(IEnumerable<ATile> tiles)
     {
-        foreach (var t in tiles.GroupBy(x => x))
+        foreach (var t in tiles.GroupBy(x => x.SimilarHashCode))
         {
             if (t.Count() == 4)
             {
@@ -23,7 +23,7 @@ public static class TileCall
 
     public static IEnumerable<TileGroup> GetPon(IEnumerable<ATile> tiles, ATile with)
     {
-        var possibles = tiles.Where(x => x == with).ToArray();
+        var possibles = tiles.Where(x => x.IsSimilarTo(with)).ToArray();
 
         if (possibles.Length < 2) yield break; // Not enough matches
 

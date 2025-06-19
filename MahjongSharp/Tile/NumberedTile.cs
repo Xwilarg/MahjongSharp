@@ -1,12 +1,12 @@
 namespace MahjongSharp.Tile;
 
-public class NumberedTile : ATile
+public record NumberedTile : ATile
 {
     public NumberedTile(int number, NumberedTileType type, bool isAkaDora)
     {
         Number = number;
         Type = type;
-        _isAkaDora = isAkaDora;
+        IsAkaDora = isAkaDora;
     }
 
     public override bool IsDora(ATile tile)
@@ -69,29 +69,12 @@ public class NumberedTile : ATile
 
     public int Number { private set; get; }
     public NumberedTileType Type { private set; get; }
-    private bool _isAkaDora;
+    public bool IsAkaDora { private set; get; }
 
-    public static bool operator ==(NumberedTile? a, NumberedTile? b)
-    {
-        if (a is null) return b is null;
-        if (b is null) return false;
-        return a.Type == b.Type && a.Number == b.Number;
-    }
+    public override bool IsSimilarTo(ATile? b)
+        => b is NumberedTile bTile && bTile != null && bTile.Type == Type && bTile.Number == Number;
 
-    public static bool operator !=(NumberedTile? a, NumberedTile? b)
-        => !(a == b);
-
-    public override bool Equals(object? o)
-    {
-        if (o is null) return false;
-        if (o is not NumberedTile tile) return false;
-        return tile == this;
-    }
-
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Type, Number);
-    }
+    public override int SimilarHashCode => HashCode.Combine(Type, Number);
 }
 
 public enum NumberedTileType
