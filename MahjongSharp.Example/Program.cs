@@ -37,12 +37,16 @@ while (true)
 
     Console.WriteLine();
     Console.WriteLine("Player");
+
+    // Display player hand
     var textNotation = TileHelper.GetTextNotation(player.Tiles);
     Console.Write(textNotation);
 
+    // ... along with the tile we just drew
     var newTile = wall.GetTile();
     Console.WriteLine($" {TileHelper.GetTextNotation([ newTile ])}");
 
+    // Hint under the text notation that associate a number/capital letter under each tile
     string hintText = "123456789ABCED";
     StringBuilder numPrev = new(); int c = 0;
     for (int i = 0; i < textNotation.Length; i++)
@@ -54,14 +58,22 @@ while (true)
         }
         else numPrev.Append(' ');
     }
+
     Console.WriteLine($"{numPrev} 0");
     Console.WriteLine("Enter an index to discard");
-    Console.WriteLine("OR");
-    Console.WriteLine("c: chii");
-    Console.WriteLine("p: pon");
-    Console.WriteLine("k: kan");
-    Console.WriteLine("r: riichi");
-    Console.WriteLine("t: tsumo");
+
+    var canChii = TileCall.CanChii(player.Tiles, newTile);
+    var canPon = TileCall.CanPon(player.Tiles, newTile);
+    var canKan = TileCall.CanKan(player.Tiles, newTile);
+    if (canChii || canPon || canKan)
+    {
+        Console.WriteLine("OR"); // Tile calls
+        if (canChii) Console.WriteLine("c: chii");
+        if (canPon) Console.WriteLine("p: pon");
+        if (canKan) Console.WriteLine("k: kan");
+        //Console.WriteLine("r: riichi");
+        //Console.WriteLine("t: tsumo");
+    }
 
     Console.ReadKey();
 }

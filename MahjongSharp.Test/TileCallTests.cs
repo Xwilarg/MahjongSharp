@@ -38,25 +38,32 @@ public class TileCallTests
         new object[] { _hand1, new NumberedTile(5, NumberedTileType.Circle, false), true }
     };
 
+    [TestCaseSource(nameof(ChiiHands))]
+    public void TestChiiWith(ATile[] hand, ATile with, bool doesMatch)
+    {
+        Assert.That(TileCall.CanChii(hand, with), doesMatch ? Is.True : Is.False);
+        Assert.That(TileCall.GetChii(hand, with), doesMatch ? Is.Not.Empty : Is.Empty);
+    }
+
     [TestCaseSource(nameof(PonHands))]
     public void TestPonWith(ATile[] hand, ATile with, bool doesMatch)
     {
-        var res = TileCall.GetPon(hand, with);
-        Assert.That(res, doesMatch ? Is.Not.Empty : Is.Empty);
+        Assert.That(TileCall.CanPon(hand, with), doesMatch ? Is.True : Is.False);
+        Assert.That(TileCall.GetPon(hand, with), doesMatch ? Is.Not.Empty : Is.Empty);
     }
 
     [TestCaseSource(nameof(KanHands))]
     public void TestKanWith(ATile[] hand, ATile with, bool doesMatch)
     {
-        var res = TileCall.GetKan(hand, with);
-        Assert.That(res, doesMatch ? Is.Not.Empty : Is.Empty);
+        Assert.That(TileCall.CanKan(hand, with), doesMatch ? Is.True : Is.False);
+        Assert.That(TileCall.GetKan(hand, with), doesMatch ? Is.Not.Empty : Is.Empty);
     }
 
     [TestCaseSource(nameof(KanHands))]
     public void TestKan(ATile[] hand, ATile with, bool doesMatch)
     {
-        var res = TileCall.GetKan([with, ..hand]);
-        Assert.That(res, doesMatch ? Is.Not.Empty : Is.Empty);
+        Assert.That(TileCall.CanKan([with, ..hand]), doesMatch ? Is.True : Is.False);
+        Assert.That(TileCall.GetKan([with, ..hand]), doesMatch ? Is.Not.Empty : Is.Empty);
     }
 
     [Test]
