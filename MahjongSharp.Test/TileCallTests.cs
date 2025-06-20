@@ -1,5 +1,6 @@
 using MahjongSharp.Game;
 using MahjongSharp.Tile;
+using MahjongSharp.Helper;
 
 namespace MahjongSharp.Test;
 
@@ -61,11 +62,7 @@ public class TileCallTests
     [Test]
     public void TestTextNotation()
     {
-        var hand = new PlayerHand(_hand1);
-
-        hand.SortHand();
-
-        Assert.That(hand.GetTextNotation(), Is.EqualTo("68s4555p11z"));
+        Assert.That(TileHelper.GetTextNotation(TileHelper.SortTiles(_hand1)), Is.EqualTo("68s4555p11z"));
     }
 
     [Test]
