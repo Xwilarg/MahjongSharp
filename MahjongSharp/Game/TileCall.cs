@@ -2,6 +2,15 @@ using MahjongSharp.Tile;
 
 namespace MahjongSharp.Game;
 
+[Flags]
+public enum InteruptionCall
+{
+    None = 0,
+    Chii = 1,
+    Pon = 2,
+    Kan = 4
+}
+
 public static class TileCall
 {
     public static bool CanKan(IEnumerable<ATile> tiles, ATile with)

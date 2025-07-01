@@ -20,14 +20,13 @@ internal abstract class APlayer
     /// <returns>Tile to be discarded, null if not applicable</returns>
     internal abstract ATile? ShowStatus(ATile? newTile);
 
-    internal InteruptionCall GetPossibleInteruptions(ATile tile)
+    protected void ShowDiscard()
     {
-        InteruptionCall call = InteruptionCall.None;
-        if (TileCall.CanChii(_hand.Tiles, tile)) call |= InteruptionCall.Chii;
-        if (TileCall.CanPon(_hand.Tiles, tile)) call |= InteruptionCall.Pon;
-        if (TileCall.CanKan(_hand.Tiles, tile)) call |= InteruptionCall.Kan;
-
-        return call;
+        Console.WriteLine("Discard");
+        for (int i = 0; i < _hand.Discard.Count; i += 6)
+        {
+            Console.WriteLine(string.Join(" ", _hand.Discard.Skip(i).Take(6).Select(x => TileHelper.GetTextNotation([x]))));
+        }
     }
 
     internal void DiscardTileFromHand(ATile tile)
@@ -46,6 +45,7 @@ internal class AIPlayer : APlayer
     internal override ATile? ShowStatus(ATile? newTile)
     {
         Console.WriteLine("AI");
+        ShowDiscard();
         Console.Write(string.Join("", Enumerable.Repeat("?", _hand.Tiles.Count)));
         if (newTile != null)
         {
@@ -84,6 +84,7 @@ internal class HumanPlayer : APlayer
     internal override ATile? ShowStatus(ATile? newTile)
     {
         Console.WriteLine("Player");
+        ShowDiscard();
 
         // Display player hand
         var textNotation = TileHelper.GetTextNotation(_hand.Tiles);
@@ -99,7 +100,7 @@ internal class HumanPlayer : APlayer
         Console.WriteLine($" {TileHelper.GetTextNotation([newTile])}");
 
         // Hint under the text notation that associate a number/capital letter under each tile
-        string hintText = "123456789ABCED";
+        string hintText = "123456789QWERT";
         StringBuilder numPrev = new(); int c = 0;
         for (int i = 0; i < textNotation.Length; i++)
         {
@@ -110,45 +111,40 @@ internal class HumanPlayer : APlayer
             }
             else numPrev.Append(' ');
         }
-        c--;
 
         Console.WriteLine($"{numPrev} 0");
         Console.WriteLine("Enter an index to discard");
 
-        var canChii = TileCall.CanChii(_hand.Tiles, newTile);
-        var canPon = TileCall.CanPon(_hand.Tiles, newTile);
-        var canKan = TileCall.CanKan(_hand.Tiles, newTile);
-        if (canChii || canPon || canKan)
+        List<char> acceptableInputs = ['0', .. hintText.Take(c)];
+
+        var calls = _hand.GetPossibleInteruptions(newTile);
+        if (calls != InteruptionCall.None)
         {
             Console.WriteLine("OR"); // Tile calls
-            if (canChii) Console.WriteLine("c: chii");
-            if (canPon) Console.WriteLine("p: pon");
-            if (canKan) Console.WriteLine("k: kan");
+            if (calls.HasFlag(InteruptionCall.Chii)) { Console.WriteLine("C: chii"); acceptableInputs.Add('C'); }
+            if (calls.HasFlag(InteruptionCall.Pon)) { Console.WriteLine("P: pon"); acceptableInputs.Add('P'); }
+            if (calls.HasFlag(InteruptionCall.Kan)) { Console.WriteLine("K: kan"); acceptableInputs.Add('K'); }
             //Console.WriteLine("r: riichi");
             //Console.WriteLine("t: tsumo");
         }
 
-        ConsoleKeyInfo key;
+        char key;
         do
         {
-            key = Console.ReadKey();
-        } while (key.KeyChar < '0' && key.KeyChar > hintText[c]);
+            key = char.ToUpperInvariant(Console.ReadKey().KeyChar);
+        } while (!acceptableInputs.Contains(key));
 
         ATile discard;
-        if (key.KeyChar == '0') discard = newTile;
-        else discard = _hand.Tiles[key.KeyChar - '1'];
+        if (key == '0') discard = newTile;
+        if (key == 'C')
+        {
+            var possibleChii = TileCall.GetChii(_hand.Tiles, newTile);
+           // _hand.MakeOpenCall(InteruptionCall.Chii, )
+        }
+        else discard = _hand.Tiles[hintText.IndexOf(key)];
 
         _hand.AddTile(newTile);
 
         return discard;
     }
-}
-
-[Flags]
-public enum InteruptionCall
-{
-    None = 0,
-    Chii = 1,
-    Pon = 2,
-    Kan = 4
 }
