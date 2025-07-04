@@ -1,6 +1,6 @@
 using MahjongSharp.Tile;
 
-namespace MahjongSharp.Game;
+namespace MahjongSharp.Helper;
 
 [Flags]
 public enum InteruptionCall
@@ -66,9 +66,9 @@ public static class TileCall
 
         var possibles = tiles.Where(x => x is NumberedTile xNumTile && xNumTile.Type == numTile.Type).Select(x => (NumberedTile)x);
         return
-            (possibles.Any(x => x.Number == numTile.Number - 1) && possibles.Any(x => x.Number == numTile.Number - 2)) ||
-            (possibles.Any(x => x.Number == numTile.Number + 1) && possibles.Any(x => x.Number == numTile.Number + 2)) ||
-            (possibles.Any(x => x.Number == numTile.Number - 1) && possibles.Any(x => x.Number == numTile.Number + 1));
+            possibles.Any(x => x.Number == numTile.Number - 1) && possibles.Any(x => x.Number == numTile.Number - 2) ||
+            possibles.Any(x => x.Number == numTile.Number + 1) && possibles.Any(x => x.Number == numTile.Number + 2) ||
+            possibles.Any(x => x.Number == numTile.Number - 1) && possibles.Any(x => x.Number == numTile.Number + 1);
     }
 
     public static IEnumerable<TileGroup> GetChii(IEnumerable<ATile> tiles, ATile with)

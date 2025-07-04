@@ -1,19 +1,11 @@
+using MahjongSharp.Example;
 using MahjongSharp.Game;
 using MahjongSharp.Ruleset;
 
 // For this example, we are using riichi mahjong
 var ruleset = new RiichiRuleset();
 
-// Create the wall
-var wall = new Wall(ruleset);
-
-// We register 4 players
-APlayer[] players = [
-    new AIPlayer(wall.GetTiles(ruleset.HandSize)),
-    new AIPlayer(wall.GetTiles(ruleset.HandSize)),
-    new AIPlayer(wall.GetTiles(ruleset.HandSize)),
-    new HumanPlayer(wall.GetTiles(ruleset.HandSize))
-];
+var client = new TextGameClient(ruleset);
 
 while (true)
 {

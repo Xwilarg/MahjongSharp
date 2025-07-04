@@ -1,7 +1,7 @@
 using MahjongSharp.Tile;
 using MahjongSharp.Helper;
 
-namespace MahjongSharp.Game;
+namespace MahjongSharp.Player;
 
 public class PlayerHand
 {

@@ -1,24 +1,12 @@
-using MahjongSharp.Game;
 using MahjongSharp.Helper;
 using MahjongSharp.Tile;
 using System.Text;
+using MahjongSharp.Game;
 
-internal abstract class APlayer
+internal abstract class ATextPlayer : AGamePlayer
 {
-    internal APlayer(IEnumerable<ATile> startingTiles)
-    {
-        _hand = new PlayerHand(startingTiles);
-        _hand.SortHand();
-    }
-
-    protected PlayerHand _hand;
-
-    /// <summary>
-    /// Show the hand in the console
-    /// </summary>
-    /// <param name="newTile">Tile we just drew, null if it's not our turn</param>
-    /// <returns>Tile to be discarded, null if not applicable</returns>
-    internal abstract ATile? ShowStatus(ATile? newTile);
+    internal ATextPlayer(IEnumerable<ATile> startingTiles) : base(startingTiles, sortAuto: true)
+    { }
 
     protected void ShowDiscard()
     {
@@ -36,13 +24,18 @@ internal abstract class APlayer
     }
 }
 
-internal class AIPlayer : APlayer
+internal class AIPlayer : ATextPlayer
 {
     internal AIPlayer(IEnumerable<ATile> startingTiles) : base(startingTiles)
     { }
 
+    public override ATile GetDiscard(ATile newTile)
+    {
+        return newTile;
+    }
+
     /// <inheritdoc/>
-    internal override ATile? ShowStatus(ATile? newTile)
+    public override void ShowStatus(ATile? newTile)
     {
         Console.WriteLine("AI");
         ShowDiscard();
@@ -51,14 +44,12 @@ internal class AIPlayer : APlayer
         {
             Console.WriteLine(" ?");
             _hand.AddTile(newTile);
-            return _hand.Tiles[0];
         }
-        Console.WriteLine();
-        return null;
+        else Console.WriteLine();
     }
 }
 
-internal class HumanPlayer : APlayer
+internal class HumanPlayer : ATextPlayer
 {
     internal HumanPlayer(IEnumerable<ATile> startingTiles) : base(startingTiles)
     { }
@@ -80,8 +71,13 @@ internal class HumanPlayer : APlayer
         }
     }
 
+    public override ATile GetDiscard(ATile newTile)
+    {
+        return newTile;
+    }
+
     /// <inheritdoc/>
-    internal override ATile? ShowStatus(ATile? newTile)
+    internal override void ShowStatus(ATile? newTile)
     {
         Console.WriteLine("Player");
         ShowDiscard();
@@ -138,8 +134,9 @@ internal class HumanPlayer : APlayer
         if (key == '0') discard = newTile;
         if (key == 'C')
         {
+            return discard;
             var possibleChii = TileCall.GetChii(_hand.Tiles, newTile);
-           // _hand.MakeOpenCall(InteruptionCall.Chii, )
+            //_hand.MakeOpenCall(InteruptionCall.Chii, _hand.Tiles, with, 
         }
         else discard = _hand.Tiles[hintText.IndexOf(key)];
 

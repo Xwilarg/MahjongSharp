@@ -1,6 +1,7 @@
+using MahjongSharp.Helper;
 using MahjongSharp.Tile;
 
-namespace MahjongSharp.Game;
+namespace MahjongSharp.Player;
 
 public record PlayerTileCall
 {
