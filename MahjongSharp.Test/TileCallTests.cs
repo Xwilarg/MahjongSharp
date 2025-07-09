@@ -1,4 +1,4 @@
-using MahjongSharp.Game;
+using MahjongSharp.Player;
 using MahjongSharp.Tile;
 using MahjongSharp.Helper;
 

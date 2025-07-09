@@ -26,6 +26,12 @@ public class PlayerHand
         return call;
     }
 
+    public InteruptionCall GetPossibleInteruptions()
+    {
+        if (TileCall.CanKan(Tiles)) return InteruptionCall.Kan;
+        return InteruptionCall.None;
+    }
+
     public void MakeCloseCall(InteruptionCall call, IEnumerable<ATile> tiles)
     {
         Calls.Add(new()
@@ -67,9 +73,9 @@ public class PlayerHand
     }
 
     /// <summary>
-    /// For a tile in player hand, remove it and move it to the discard instead
+    /// Move a tile from the player hand to the discard
     /// </summary>
-    public void DiscardTileFromHand(ATile tile)
+    public void MoveToDiscard(ATile tile)
     {
         Tiles.Remove(tile);
         DiscardTile(tile);

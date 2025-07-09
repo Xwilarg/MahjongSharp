@@ -17,10 +17,21 @@ internal abstract class ATextPlayer : AGamePlayer
         }
     }
 
-    internal void DiscardTileFromHand(ATile tile)
+    protected void ShowCalls()
     {
-        _hand.DiscardTileFromHand(tile);
-        _hand.SortHand();
+        Console.WriteLine("Calls");
+        foreach (var c in _hand.Calls)
+        {
+            var text = TileHelper.GetTextNotation(c.Tiles);
+            if (c.IsOpen)
+            {
+                Console.WriteLine($"{text.Take(c.PlayerSource.Value + 1)}'{text.Skip(c.PlayerSource.Value + 1)}");
+            }
+            else
+            {
+                Console.WriteLine(text);
+            }
+        }
     }
 }
 
@@ -29,7 +40,7 @@ internal class AIPlayer : ATextPlayer
     internal AIPlayer(IEnumerable<ATile> startingTiles) : base(startingTiles)
     { }
 
-    public override ATile GetDiscard(ATile newTile)
+    public override ATile GetDiscard(ATile? newTile)
     {
         return newTile;
     }
@@ -37,13 +48,14 @@ internal class AIPlayer : ATextPlayer
     /// <inheritdoc/>
     public override void ShowStatus(ATile? newTile)
     {
-        Console.WriteLine("AI");
+        Console.WriteLine("========== AI     ===========");
         ShowDiscard();
+        ShowCalls();
+        Console.WriteLine("Hand");
         Console.Write(string.Join("", Enumerable.Repeat("?", _hand.Tiles.Count)));
         if (newTile != null)
         {
             Console.WriteLine(" ?");
-            _hand.AddTile(newTile);
         }
         else Console.WriteLine();
     }
@@ -54,7 +66,7 @@ internal class HumanPlayer : ATextPlayer
     internal HumanPlayer(IEnumerable<ATile> startingTiles) : base(startingTiles)
     { }
 
-    internal bool GetPlayerInteruption(InteruptionCall call, ATile tile)
+    private bool GetPlayerInteruption(InteruptionCall call, ATile tile)
     {
         Console.WriteLine($"Tile thrown: {TileHelper.GetTextNotation([tile])}");
 
@@ -71,29 +83,25 @@ internal class HumanPlayer : ATextPlayer
         }
     }
 
-    public override ATile GetDiscard(ATile newTile)
+    private TileGroup ShowTileGroups(TileGroup[] groups)
     {
-        return newTile;
-    }
-
-    /// <inheritdoc/>
-    internal override void ShowStatus(ATile? newTile)
-    {
-        Console.WriteLine("Player");
-        ShowDiscard();
-
-        // Display player hand
-        var textNotation = TileHelper.GetTextNotation(_hand.Tiles);
-        Console.Write(textNotation);
-
-        if (newTile == null)
+        for (int i = 0; i < groups.Length; i++)
         {
-            Console.WriteLine();
-            return null;
+            Console.WriteLine($"{i}: {TileHelper.GetTextNotation(groups[i].Tiles)}");
         }
 
-        // ... along with the tile we just drew
-        Console.WriteLine($" {TileHelper.GetTextNotation([newTile])}");
+        char key;
+        do
+        {
+            key = char.ToUpperInvariant(Console.ReadKey().KeyChar);
+        } while (key < '0' || key >= '0' + groups.Length);
+
+        return groups[key - '0'];
+    }
+
+    public override ATile GetDiscard(ATile? newTile)
+    {
+        var textNotation = TileHelper.GetTextNotation(_hand.Tiles);
 
         // Hint under the text notation that associate a number/capital letter under each tile
         string hintText = "123456789QWERT";
@@ -117,8 +125,6 @@ internal class HumanPlayer : ATextPlayer
         if (calls != InteruptionCall.None)
         {
             Console.WriteLine("OR"); // Tile calls
-            if (calls.HasFlag(InteruptionCall.Chii)) { Console.WriteLine("C: chii"); acceptableInputs.Add('C'); }
-            if (calls.HasFlag(InteruptionCall.Pon)) { Console.WriteLine("P: pon"); acceptableInputs.Add('P'); }
             if (calls.HasFlag(InteruptionCall.Kan)) { Console.WriteLine("K: kan"); acceptableInputs.Add('K'); }
             //Console.WriteLine("r: riichi");
             //Console.WriteLine("t: tsumo");
@@ -132,16 +138,40 @@ internal class HumanPlayer : ATextPlayer
 
         ATile discard;
         if (key == '0') discard = newTile;
-        if (key == 'C')
-        {
-            return discard;
-            var possibleChii = TileCall.GetChii(_hand.Tiles, newTile);
-            //_hand.MakeOpenCall(InteruptionCall.Chii, _hand.Tiles, with, 
+        else if (key == 'K')
+        { // Closed kan, we form the kan and ask again which hand need to be draw
+            var possibleChii = TileCall.GetKan(_hand.Tiles, newTile);
+            var group = ShowTileGroups(possibleChii.ToArray());
+            _hand.MakeCloseCall(InteruptionCall.Kan, group.Tiles);
+
+            GameClient.UpdateCurrentPlayerStatus(newTile);
+            return GetDiscard(newTile);
         }
         else discard = _hand.Tiles[hintText.IndexOf(key)];
 
-        _hand.AddTile(newTile);
-
         return discard;
+    }
+
+    /// <inheritdoc/>
+    public override void ShowStatus(ATile? newTile)
+    {
+        Console.WriteLine("========== Player ==========");
+        ShowDiscard();
+        ShowCalls();
+        Console.WriteLine("Hand");
+
+        // Display player hand
+        var textNotation = TileHelper.GetTextNotation(_hand.Tiles);
+        Console.Write(textNotation);
+
+        if (newTile == null)
+        {
+            Console.WriteLine();
+        }
+        else
+        {
+            // ... along with the tile we just drew
+            Console.WriteLine($" {TileHelper.GetTextNotation([newTile])}");
+        }
     }
 }
