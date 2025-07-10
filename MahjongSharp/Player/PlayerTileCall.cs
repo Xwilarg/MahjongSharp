@@ -3,6 +3,9 @@ using MahjongSharp.Tile;
 
 namespace MahjongSharp.Player;
 
+/// <summary>
+/// Contains information about a call (mentsu) that was done
+/// </summary>
 public record PlayerTileCall
 {
     /// <summary>
@@ -13,7 +16,7 @@ public record PlayerTileCall
     /// <summary>
     /// Which call was done
     /// </summary>
-    public InteruptionCall Type { set; get; }
+    public Mentsu Type { set; get; }
     /// <summary>
     /// If the call was open, which player tile is from another player
     /// This also indicate which player threw it (0 mean player before, 1 is player in front and 2/3 is player after)

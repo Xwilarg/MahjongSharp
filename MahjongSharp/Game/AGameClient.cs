@@ -71,7 +71,7 @@ public abstract class AGameClient
         if (_currentTurn == _players.Length) _currentTurn = 0;
     }
 
-    internal void Interupt(AGamePlayer player, InteruptionCall call, IEnumerable<ATile> tiles, ATile with)
+    internal void Interupt(AGamePlayer player, Naki call, IEnumerable<ATile> tiles, ATile with)
     {
         var tile = _players[_currentTurn].RemoveLastDiscard();
         UpdatePlayerStatus(_currentTurn, null);
@@ -82,23 +82,28 @@ public abstract class AGameClient
         //_players[_currentTurn].AddTileToHandThenDiscard
     }
 
-    public Dictionary<AGamePlayer, InteruptionCall> GetPossibleInteruptions()
+    public Dictionary<AGamePlayer, Naki> GetPossibleInteruptions()
     {
         if (_players.Length == 0) throw new InvalidGameState("There is no player registered, please call SetPlayers first");
 
         var lastDiscard = _players[_currentTurn].LastDiscarded;
         if (lastDiscard == null) throw new InvalidGameState("There is no available discard on the last player");
 
-        Dictionary<AGamePlayer, InteruptionCall> interuptions = [];
+        Dictionary<AGamePlayer, Naki> interuptions = [];
         for (int i = 0; i < _players.Length; i++)
         {
             if (i == _currentTurn) continue; // Player can't interupt himself
 
             // Get possibles calls
             // We can only chii if the tile is thrown by the player before us
-            var interupt = _players[i].GetPossibleInteruptions(lastDiscard, i == _currentTurn - 1 || (i == 0 && _currentTurn == _players.Length - 1));
+            var interupt = _players[i].GetPossibleClosedInteruptions(lastDiscard);
 
-            if (interupt != InteruptionCall.None)
+            // We can only chii if the tile is from the player before us
+            var canChii = i == _currentTurn - 1 || (i == 0 && _currentTurn == _players.Length - 1);
+            if (!canChii) interupt &= ~Naki.Chii;
+
+
+            if (interupt != Naki.None)
             {
                 interuptions.Add(_players[i], interupt);
             }

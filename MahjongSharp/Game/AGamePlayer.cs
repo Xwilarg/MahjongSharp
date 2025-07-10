@@ -4,63 +4,48 @@ using MahjongSharp.Tile;
 
 namespace MahjongSharp.Game;
 
-public abstract class AGamePlayer
+public abstract class AGamePlayer : PlayerHand
 {
-    public AGamePlayer(IEnumerable<ATile> startingTiles, bool sortAuto = true)
+    public AGamePlayer(IEnumerable<ATile> startingTiles, bool sortAuto = true) : base(startingTiles)
     {
-        _hand = new PlayerHand(startingTiles);
         _sortAuto = sortAuto;
-        if (sortAuto) _hand.SortHand();
+        if (sortAuto) SortHand();
     }
 
     public void AddTileToHandThenDiscard(ATile newTile, ATile discardTile)
     {
-        if (newTile == discardTile)
+        if (newTile == discardTile) // Tile discarded is the tile we just drew
         {
-            _hand.DiscardTile(newTile);
+            Discard.Push(newTile);
         }
         else
         {
-            _hand.AddTile(newTile);
-            _hand.DiscardTile(discardTile);
+            Tiles.Add(newTile);
+            Discard.Push(discardTile);
         }
-        if (_sortAuto) _hand.SortHand();
+        if (_sortAuto) SortHand();
     }
 
     public ATile RemoveLastDiscard()
     {
-        return _hand.RemoveLastDiscard();
+        return Discard.Pop();
     }
 
-    public InteruptionCall GetPossibleInteruptions(ATile tile, bool canChii)
-    {
-        var interupt = _hand.GetPossibleInteruptions(tile);
-        if (!canChii) interupt &= ~InteruptionCall.Chii;
-
-        return interupt;
-    }
-
-    public void Interupt(InteruptionCall call, IEnumerable<ATile> tiles, ATile with)
+    public void Interupt(Naki call, IEnumerable<ATile> tiles, ATile with)
     {
         GameClient.Interupt(this, call, tiles, with);
     }
 
-    internal void MakeOpenCall(InteruptionCall call, IEnumerable<ATile> tiles, ATile with, int from)
-    {
-        _hand.MakeOpenCall(call, tiles, with, from);
-    }
-
-    public ATile? LastDiscarded => _hand.Discard.Count == 0 ? null : _hand.Discard.Last();
+    public ATile? LastDiscarded => Discard.Count == 0 ? null : Discard.Peek();
 
     /// <summary>
     /// Called when the hand need to be updated
     /// </summary>
     /// <param name="newTile">Tile we just drew, null if it's not our turn</param>
     public abstract void ShowStatus(ATile? newTile);
-    public abstract ATile GetDiscard(ATile? newTile);
+    public abstract ATile GetDiscard(ATile newTile);
 
     private bool _sortAuto;
-    protected PlayerHand _hand;
 
     public AGameClient GameClient { set; protected get; }
 }

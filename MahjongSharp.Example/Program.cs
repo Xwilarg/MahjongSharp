@@ -13,7 +13,7 @@ while (true)
 
     var possibleInteruptions = client.GetPossibleInteruptions();
 
-    var ponInterupt = possibleInteruptions.FirstOrDefault(x => x.Value.HasFlag(InteruptionCall.Pon) || x.Value.HasFlag(InteruptionCall.Kan));
+    var ponInterupt = possibleInteruptions.FirstOrDefault(x => x.Value.HasFlag(Naki.Pon) || x.Value.HasFlag(Naki.Kan));
 
     await Task.Delay(500);
 }

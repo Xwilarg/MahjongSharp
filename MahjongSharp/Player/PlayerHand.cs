@@ -16,29 +16,27 @@ public class PlayerHand
         Calls = [];
     }
 
-    public InteruptionCall GetPossibleInteruptions(ATile with)
+    public virtual Naki GetPossibleOpenInteruptions(ATile with)
     {
-        InteruptionCall call = InteruptionCall.None;
-        if (TileCall.CanChii(Tiles, with)) call |= InteruptionCall.Chii;
-        if (TileCall.CanPon(Tiles, with)) call |= InteruptionCall.Pon;
-        if (
-            TileCall.CanKan(Tiles, with) // Hand interupt with given tile
-            || Calls.Any(x => x.Type == InteruptionCall.Pon && TileCall.CanKan(x.Tiles, with)) // We have a pon that can be changed to a kan
-        )
-        {
-            call |= InteruptionCall.Kan;
-        }
+        Naki call = Naki.None;
+        if (TileCall.CanChii(Tiles, with)) call |= Naki.Chii;
+        if (TileCall.CanPon(Tiles, with)) call |= Naki.Pon;
+        if (TileCall.CanKan(Tiles, with)) call |= Naki.Kan;
 
         return call;
     }
 
-    public InteruptionCall GetPossibleInteruptions()
+    public virtual Naki GetPossibleClosedInteruptions(ATile with)
     {
-        if (TileCall.CanKan(Tiles)) return InteruptionCall.Kan;
-        return InteruptionCall.None;
+        Naki call = Naki.None;
+        if (TileCall.CanKan(Tiles)) call |= Naki.Kan;
+        if (Calls.Any(x => x.Type == Mentsu.Pon && TileCall.CanKan(x.Tiles, with))) // We have a pon that can be changed to a kan
+            call |= Naki.PonToKan;
+
+        return Naki.None;
     }
 
-    public void MakeCloseCall(InteruptionCall call, IEnumerable<ATile> tiles)
+    public void MakeCloseCall(Mentsu call, IEnumerable<ATile> tiles)
     {
         Calls.Add(new()
         {
@@ -51,7 +49,7 @@ public class PlayerHand
         foreach (var t in tiles) Tiles.Remove(t);
     }
 
-    public void MakeOpenCall(InteruptionCall call, IEnumerable<ATile> tiles, ATile with, int from)
+    public void MakeOpenCall(Mentsu call, IEnumerable<ATile> tiles, ATile with, int from)
     {
         List<ATile> lTiles = tiles.ToList();
         if (from == lTiles.Count) lTiles.Add(with);
@@ -70,31 +68,10 @@ public class PlayerHand
 
     public void UpdatePonToKan(ATile with)
     {
-        var call = Calls.First(x => x.Type == InteruptionCall.Pon && x.Tiles.All(x => x.IsSimilarTo(with)));
+        var call = Calls.First(x => x.Type == Mentsu.Pon && x.Tiles.All(x => x.IsSimilarTo(with)));
         call.IsKanAdded = true;
         List<ATile> tiles = call.Tiles.ToList();
 
-    }
-
-    /// <summary>
-    /// Add a new tile to the player hand
-    /// </summary>
-    public void AddTile(ATile tile)
-    {
-        Tiles.Add(tile);
-    }
-
-    /// <summary>
-    /// Add a new tile to the player discard
-    /// </summary>
-    public void DiscardTile(ATile tile)
-    {
-        Discard.Push(tile);
-    }
-
-    public ATile RemoveLastDiscard()
-    {
-        return Discard.Pop();
     }
 
     /// <summary>
@@ -103,7 +80,7 @@ public class PlayerHand
     public void MoveToDiscard(ATile tile)
     {
         Tiles.Remove(tile);
-        DiscardTile(tile);
+        Discard.Push(tile);
     }
 
     /// <summary>

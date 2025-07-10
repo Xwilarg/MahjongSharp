@@ -11,16 +11,16 @@ internal abstract class ATextPlayer : AGamePlayer
     protected void ShowDiscard()
     {
         Console.WriteLine("Discard");
-        for (int i = 0; i < _hand.Discard.Count; i += 6)
+        for (int i = 0; i < Discard.Count; i += 6)
         {
-            Console.WriteLine(string.Join(" ", _hand.Discard.Skip(i).Take(6).Select(x => TileHelper.GetTextNotation([x]))));
+            Console.WriteLine(string.Join(" ", Discard.Skip(i).Take(6).Select(x => TileHelper.GetTextNotation([x]))));
         }
     }
 
     protected void ShowCalls()
     {
         Console.WriteLine("Calls");
-        foreach (var c in _hand.Calls)
+        foreach (var c in Calls)
         {
             var text = TileHelper.GetTextNotation(c.Tiles);
             if (c.IsOpen)
@@ -43,7 +43,7 @@ internal abstract class ATextPlayer : AGamePlayer
     /// A tuple associating the call we do and which tiles we do it with
     /// If we don't do anything, first element of the tuple will be InteruptionCall.None
     /// </returns>
-    public abstract (InteruptionCall call, IEnumerable<ATile> tiles) GetCallChoice(InteruptionCall call, ATile tile);
+    public abstract (Naki call, IEnumerable<ATile> tiles) GetCallChoice(Naki call, ATile tile);
 }
 
 internal class AIPlayer : ATextPlayer
@@ -51,12 +51,12 @@ internal class AIPlayer : ATextPlayer
     internal AIPlayer(IEnumerable<ATile> startingTiles) : base(startingTiles)
     { }
 
-    public override (InteruptionCall call, IEnumerable<ATile> tiles) GetCallChoice(InteruptionCall call, ATile tile)
+    public override (Naki call, IEnumerable<ATile> tiles) GetCallChoice(Naki call, ATile tile)
     {
-        return (InteruptionCall.None, []);
+        return (Naki.None, []);
     }
 
-    public override ATile GetDiscard(ATile? newTile)
+    public override ATile GetDiscard(ATile newTile)
     {
         return newTile;
     }
@@ -68,7 +68,7 @@ internal class AIPlayer : ATextPlayer
         ShowDiscard();
         ShowCalls();
         Console.WriteLine("Hand");
-        Console.Write(string.Join("", Enumerable.Repeat("?", _hand.Tiles.Count)));
+        Console.Write(string.Join("", Enumerable.Repeat("?", Tiles.Count)));
         if (newTile != null)
         {
             Console.WriteLine(" ?");
@@ -82,14 +82,14 @@ internal class HumanPlayer : ATextPlayer
     internal HumanPlayer(IEnumerable<ATile> startingTiles) : base(startingTiles)
     { }
 
-    public override (InteruptionCall call, IEnumerable<ATile> tiles) GetCallChoice(InteruptionCall call, ATile tile)
+    public override (Naki call, IEnumerable<ATile> tiles) GetCallChoice(Naki call, ATile tile)
     {
         Console.WriteLine();
         Console.WriteLine($"Tile thrown: {TileHelper.GetTextNotation([tile])}");
 
-        if (call.HasFlag(InteruptionCall.Chii)) Console.WriteLine("c: chii");
-        if (call.HasFlag(InteruptionCall.Pon)) Console.WriteLine("p: pon");
-        if (call.HasFlag(InteruptionCall.Kan)) Console.WriteLine("k: kan");
+        if (call.HasFlag(Naki.Chii)) Console.WriteLine("c: chii");
+        if (call.HasFlag(Naki.Pon)) Console.WriteLine("p: pon");
+        if (call.HasFlag(Naki.Kan)) Console.WriteLine("k: kan");
         Console.WriteLine("s: Skip");
 
         ConsoleKeyInfo k;
@@ -97,28 +97,32 @@ internal class HumanPlayer : ATextPlayer
         {
             k = Console.ReadKey();
 
-            if (k.Key == ConsoleKey.S) return (InteruptionCall.None, []);
+            if (k.Key == ConsoleKey.S) return (Naki.None, []);
 
-            if (call.HasFlag(InteruptionCall.Chii) && k.Key == ConsoleKey.C)
+            IEnumerable<ATile>[] tiles;
+            if (call.HasFlag(Naki.Chii) && k.Key == ConsoleKey.C)
             {
-                return (InteruptionCall.Chii, ShowTileGroups(TileCall.GetChii(_hand.Tiles, tile).ToArray()).Tiles);
+                tiles = TileCall.GetChii(Tiles, tile).Select(x => x.Tiles).ToArray();
+                return (Naki.Chii, tiles[ShowTileGroups(tiles)]);
             }
-            if (call.HasFlag(InteruptionCall.Pon) && k.Key == ConsoleKey.P)
+            if (call.HasFlag(Naki.Pon) && k.Key == ConsoleKey.P)
             {
-                return (InteruptionCall.Pon, ShowTileGroups(TileCall.GetPon(_hand.Tiles, tile).ToArray()).Tiles);
+                tiles = TileCall.GetPon(Tiles, tile).Select(x => x.Tiles).ToArray();
+                return (Naki.Pon, tiles[ShowTileGroups(tiles)]);
             }
-            if (call.HasFlag(InteruptionCall.Kan) && k.Key == ConsoleKey.K)
+            if (call.HasFlag(Naki.Kan) && k.Key == ConsoleKey.K)
             {
-                return (InteruptionCall.Kan, ShowTileGroups(TileCall.GetKan(_hand.Tiles, tile).ToArray()).Tiles);
+                tiles = TileCall.GetKan(Tiles, tile).Select(x => x.Tiles).ToArray();
+                return (Naki.Kan, tiles[ShowTileGroups(tiles)]);
             }
         }
     }
 
-    private TileGroup ShowTileGroups(TileGroup[] groups)
+    private int ShowTileGroups(IEnumerable<ATile>[] groups)
     {
         for (int i = 0; i < groups.Length; i++)
         {
-            Console.WriteLine($"{i}: {TileHelper.GetTextNotation(groups[i].Tiles)}");
+            Console.WriteLine($"{i}: {TileHelper.GetTextNotation(groups[i])}");
         }
 
         char key;
@@ -127,12 +131,12 @@ internal class HumanPlayer : ATextPlayer
             key = char.ToUpperInvariant(Console.ReadKey().KeyChar);
         } while (key < '0' || key >= '0' + groups.Length);
 
-        return groups[key - '0'];
+        return key - '0';
     }
 
-    public override ATile GetDiscard(ATile? newTile)
+    public override ATile GetDiscard(ATile newTile)
     {
-        var textNotation = TileHelper.GetTextNotation(_hand.Tiles);
+        var textNotation = TileHelper.GetTextNotation(Tiles);
 
         // Hint under the text notation that associate a number/capital letter under each tile
         string hintText = "123456789QWERT";
@@ -152,11 +156,12 @@ internal class HumanPlayer : ATextPlayer
 
         List<char> acceptableInputs = ['0', .. hintText.Take(c)];
 
-        var calls = _hand.GetPossibleInteruptions(newTile);
-        if (calls != InteruptionCall.None)
+        // List of calls we can do
+        var calls = GetPossibleClosedInteruptions(newTile);
+        if (calls != Naki.None)
         {
             Console.WriteLine("OR"); // Tile calls
-            if (calls.HasFlag(InteruptionCall.Kan)) { Console.WriteLine("K: kan"); acceptableInputs.Add('K'); }
+            if (calls.HasFlag(Naki.Kan) || calls.HasFlag(Naki.PonToKan)) { Console.WriteLine("K: kan"); acceptableInputs.Add('K'); }
             //Console.WriteLine("r: riichi");
             //Console.WriteLine("t: tsumo");
         }
@@ -170,15 +175,44 @@ internal class HumanPlayer : ATextPlayer
         ATile discard;
         if (key == '0') discard = newTile;
         else if (key == 'K')
-        { // Closed kan, we form the kan and ask again which hand need to be draw
-            var possibleChii = TileCall.GetKan(_hand.Tiles, newTile);
-            var group = ShowTileGroups(possibleChii.ToArray());
-            _hand.MakeCloseCall(InteruptionCall.Kan, group.Tiles);
+        {
+            // We ask the player which kan he want to form
+            // This can happen if we have multiple possible closed kan available
+            // Or if additional to one/many closed kan we can also convert a pon to a kan
+
+            List<IEnumerable<ATile>> tiles = [];
+            int index = 0;
+
+            if (calls.HasFlag(Naki.PonToKan)) // Pon that can be changed to a kan
+            {
+                tiles.Add(TileCall.GetKan(Calls, newTile).Tiles);
+
+            }
+            if (calls.HasFlag(Naki.Kan)) // Closed kan
+            {
+                tiles.AddRange(TileCall.GetKan(Tiles).Select(x => x.Tiles));
+            }
+
+            if (tiles.Count > 0)
+            {
+                index = ShowTileGroups(tiles.ToArray());
+            }
+
+            var res = tiles[index];
+
+            if (index == 0 && calls.HasFlag(Naki.PonToKan))
+            {
+                UpdatePonToKan(newTile);
+            }
+            else
+            {
+                MakeCloseCall(Mentsu.Kan, res);
+            }
 
             GameClient.UpdateCurrentPlayerStatus(newTile);
-            return GetDiscard(newTile);
+            return GetDiscard(newTile); // We still need to discard a tile
         }
-        else discard = _hand.Tiles[hintText.IndexOf(key)];
+        else discard = Tiles[hintText.IndexOf(key)];
 
         return discard;
     }
@@ -192,7 +226,7 @@ internal class HumanPlayer : ATextPlayer
         Console.WriteLine("Hand");
 
         // Display player hand
-        var textNotation = TileHelper.GetTextNotation(_hand.Tiles);
+        var textNotation = TileHelper.GetTextNotation(Tiles);
         Console.Write(textNotation);
 
         if (newTile == null)

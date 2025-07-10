@@ -1,14 +1,60 @@
+using MahjongSharp.Player;
 using MahjongSharp.Tile;
 
 namespace MahjongSharp.Helper;
 
+/// <summary>
+/// Mentsu are groups of tiles that can form a winning hand
+/// https://riichi.wiki/Mentsu
+/// </summary>
+public enum Mentsu
+{
+    /// <summary>
+    /// Sequence of tiles
+    /// </summary>
+    Chii = 1,
+    /// <summary>
+    /// 3 times the same tile
+    /// </summary>
+    Pon = 2,
+    /// <summary>
+    /// 4 times the same tile
+    /// </summary>
+    Kan = 4
+}
+
+/// <summary>
+/// All possibles calls
+/// </summary>
 [Flags]
-public enum InteruptionCall
+public enum Naki
 {
     None = 0,
+    /// <summary>
+    /// Sequence of tiles
+    /// </summary>
     Chii = 1,
+    /// <summary>
+    /// 3 times the same tile
+    /// </summary>
     Pon = 2,
-    Kan = 4
+    /// <summary>
+    /// 4 times the same tile
+    /// </summary>
+    Kan = 4,
+    /// <summary>
+    /// A pon that can be turned into a kan if we drew the same tile
+    /// </summary>
+    PonToKan = 8,
+    /// <summary>
+    /// North winds in 3P riichi
+    /// Or flowers in MCR
+    /// </summary>
+    Flower = 16,
+    /// <summary>
+    /// Ron or tsumo, depending of the tile is from another player or not
+    /// </summary>
+    Agari = 32
 }
 
 public static class TileCall
@@ -38,6 +84,16 @@ public static class TileCall
                 yield return new TileGroup() { Tiles = t };
             }
         }
+    }
+
+    public static bool CanKan(IEnumerable<PlayerTileCall> calls, ATile with)
+    {
+        return calls.Any(x => x.Type == Mentsu.Pon && x.Tiles.All(x => x.IsSimilarTo(with)));
+    }
+
+    public static PlayerTileCall? GetKan(IEnumerable<PlayerTileCall> calls, ATile with)
+    {
+        return calls.FirstOrDefault(x => x.Type == Mentsu.Pon && x.Tiles.All(x => x.IsSimilarTo(with)));
     }
 
     public static bool CanPon(IEnumerable<ATile> tiles, ATile with)
