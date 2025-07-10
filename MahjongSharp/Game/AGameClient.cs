@@ -71,9 +71,15 @@ public abstract class AGameClient
         if (_currentTurn == _players.Length) _currentTurn = 0;
     }
 
-    public void Interupt(AGamePlayer player, InteruptionCall call)
+    internal void Interupt(AGamePlayer player, InteruptionCall call, IEnumerable<ATile> tiles, ATile with)
     {
-        _players[_currentTurn].AddTileToHandThenDiscard
+        var tile = _players[_currentTurn].RemoveLastDiscard();
+        UpdatePlayerStatus(_currentTurn, null);
+
+        //player.MakeOpenCall(call, tiles, with, )
+
+
+        //_players[_currentTurn].AddTileToHandThenDiscard
     }
 
     public Dictionary<AGamePlayer, InteruptionCall> GetPossibleInteruptions()

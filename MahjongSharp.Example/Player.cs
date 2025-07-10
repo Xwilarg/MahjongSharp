@@ -33,12 +33,28 @@ internal abstract class ATextPlayer : AGamePlayer
             }
         }
     }
+
+    /// <summary>
+    /// How the player react to a call possibility
+    /// </summary>
+    /// <param name="call">All the calls we can do</param>
+    /// <param name="tile">Tile that was last discarded, that we interact with</param>
+    /// <returns>
+    /// A tuple associating the call we do and which tiles we do it with
+    /// If we don't do anything, first element of the tuple will be InteruptionCall.None
+    /// </returns>
+    public abstract (InteruptionCall call, IEnumerable<ATile> tiles) GetCallChoice(InteruptionCall call, ATile tile);
 }
 
 internal class AIPlayer : ATextPlayer
 {
     internal AIPlayer(IEnumerable<ATile> startingTiles) : base(startingTiles)
     { }
+
+    public override (InteruptionCall call, IEnumerable<ATile> tiles) GetCallChoice(InteruptionCall call, ATile tile)
+    {
+        return (InteruptionCall.None, []);
+    }
 
     public override ATile GetDiscard(ATile? newTile)
     {
@@ -66,8 +82,9 @@ internal class HumanPlayer : ATextPlayer
     internal HumanPlayer(IEnumerable<ATile> startingTiles) : base(startingTiles)
     { }
 
-    private bool GetPlayerInteruption(InteruptionCall call, ATile tile)
+    public override (InteruptionCall call, IEnumerable<ATile> tiles) GetCallChoice(InteruptionCall call, ATile tile)
     {
+        Console.WriteLine();
         Console.WriteLine($"Tile thrown: {TileHelper.GetTextNotation([tile])}");
 
         if (call.HasFlag(InteruptionCall.Chii)) Console.WriteLine("c: chii");
@@ -75,11 +92,25 @@ internal class HumanPlayer : ATextPlayer
         if (call.HasFlag(InteruptionCall.Kan)) Console.WriteLine("k: kan");
         Console.WriteLine("s: Skip");
 
+        ConsoleKeyInfo k;
         while (true)
         {
-            var k = Console.ReadKey();
+            k = Console.ReadKey();
 
-            if (k.Key == ConsoleKey.S) return false;
+            if (k.Key == ConsoleKey.S) return (InteruptionCall.None, []);
+
+            if (call.HasFlag(InteruptionCall.Chii) && k.Key == ConsoleKey.C)
+            {
+                return (InteruptionCall.Chii, ShowTileGroups(TileCall.GetChii(_hand.Tiles, tile).ToArray()).Tiles);
+            }
+            if (call.HasFlag(InteruptionCall.Pon) && k.Key == ConsoleKey.P)
+            {
+                return (InteruptionCall.Pon, ShowTileGroups(TileCall.GetPon(_hand.Tiles, tile).ToArray()).Tiles);
+            }
+            if (call.HasFlag(InteruptionCall.Kan) && k.Key == ConsoleKey.K)
+            {
+                return (InteruptionCall.Kan, ShowTileGroups(TileCall.GetKan(_hand.Tiles, tile).ToArray()).Tiles);
+            }
         }
     }
 

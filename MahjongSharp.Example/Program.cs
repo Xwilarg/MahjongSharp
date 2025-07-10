@@ -1,5 +1,5 @@
 using MahjongSharp.Example;
-using MahjongSharp.Game;
+using MahjongSharp.Helper;
 using MahjongSharp.Ruleset;
 
 // For this example, we are using riichi mahjong
@@ -12,6 +12,8 @@ while (true)
     client.PlayNextTurn();
 
     var possibleInteruptions = client.GetPossibleInteruptions();
+
+    var ponInterupt = possibleInteruptions.FirstOrDefault(x => x.Value.HasFlag(InteruptionCall.Pon) || x.Value.HasFlag(InteruptionCall.Kan));
 
     await Task.Delay(500);
 }

@@ -27,12 +27,27 @@ public abstract class AGamePlayer
         if (_sortAuto) _hand.SortHand();
     }
 
+    public ATile RemoveLastDiscard()
+    {
+        return _hand.RemoveLastDiscard();
+    }
+
     public InteruptionCall GetPossibleInteruptions(ATile tile, bool canChii)
     {
         var interupt = _hand.GetPossibleInteruptions(tile);
         if (!canChii) interupt &= ~InteruptionCall.Chii;
 
         return interupt;
+    }
+
+    public void Interupt(InteruptionCall call, IEnumerable<ATile> tiles, ATile with)
+    {
+        GameClient.Interupt(this, call, tiles, with);
+    }
+
+    internal void MakeOpenCall(InteruptionCall call, IEnumerable<ATile> tiles, ATile with, int from)
+    {
+        _hand.MakeOpenCall(call, tiles, with, from);
     }
 
     public ATile? LastDiscarded => _hand.Discard.Count == 0 ? null : _hand.Discard.Last();
