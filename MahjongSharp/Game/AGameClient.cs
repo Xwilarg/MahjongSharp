@@ -65,7 +65,7 @@ public abstract class AGameClient
 
         UpdatePlayerStatus(_currentTurn, tile);
 
-        DiscardCurrentPlayer();
+        DiscardCurrentPlayer(tile);
     }
 
     internal void Interupt(AGamePlayer player, Mentsu call, IEnumerable<ATile> tiles)
@@ -83,14 +83,22 @@ public abstract class AGameClient
 
         _currentTurn = turnIndex;
 
-        DiscardCurrentPlayer();
+        DiscardCurrentPlayer(null);
     }
 
-    private void DiscardCurrentPlayer()
+    private void DiscardCurrentPlayer(ATile? tile)
     {
         var currPlayer = _players[_currentTurn];
-        var discardTile = currPlayer.GetDiscard(null);
-        currPlayer.Discard.Push(discardTile);
+        var discardTile = currPlayer.GetDiscard(tile);
+
+        if (tile == null)
+        {
+            currPlayer.MoveToDiscard(discardTile);
+        }
+        else
+        {
+            currPlayer.AddTileToHandThenDiscard(tile, discardTile);
+        }
 
         UpdatePlayerStatus(_currentTurn, null);
     }
