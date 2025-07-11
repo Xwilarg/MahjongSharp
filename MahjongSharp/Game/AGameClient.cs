@@ -56,37 +56,50 @@ public abstract class AGameClient
 
     public void PlayNextTurn()
     {
+        _currentTurn++;
+        if (_currentTurn == _players.Length) _currentTurn = 0;
+
         if (_players.Length == 0) throw new InvalidGameState("There is no player registered, please call SetPlayers first");
 
         var tile = _wall.GetTile();
 
         UpdatePlayerStatus(_currentTurn, tile);
-        var currPlayer = _players[_currentTurn];
-        var discardTile = currPlayer.GetDiscard(tile);
-        currPlayer.AddTileToHandThenDiscard(tile, discardTile);
 
-        UpdatePlayerStatus(_currentTurn, null);
-
-        _currentTurn++;
-        if (_currentTurn == _players.Length) _currentTurn = 0;
+        DiscardCurrentPlayer();
     }
 
-    internal void Interupt(AGamePlayer player, Naki call, IEnumerable<ATile> tiles, ATile with)
+    internal void Interupt(AGamePlayer player, Mentsu call, IEnumerable<ATile> tiles)
     {
-        var tile = _players[_currentTurn].RemoveLastDiscard();
+        var discard = _players[_currentTurn].RemoveLastDiscard();
         UpdatePlayerStatus(_currentTurn, null);
 
-        //player.MakeOpenCall(call, tiles, with, )
+        var turnIndex = Array.IndexOf(_players, player);
+        int relativeIndex;
+        if ((turnIndex == 0 && _currentTurn == _players.Length - 1) || turnIndex == _currentTurn - 1) relativeIndex = 0; // Player before
+        else if ((turnIndex == _players.Length - 1 && _currentTurn == 0) || turnIndex == _currentTurn - 1) relativeIndex = _players.Length - 2; // Player after
+        else turnIndex = 1; // Player in front
 
+        player.MakeOpenCall(call, tiles, discard, turnIndex);
 
-        //_players[_currentTurn].AddTileToHandThenDiscard
+        _currentTurn = turnIndex;
+
+        DiscardCurrentPlayer();
     }
 
-    public Dictionary<AGamePlayer, Naki> GetPossibleInteruptions()
+    private void DiscardCurrentPlayer()
+    {
+        var currPlayer = _players[_currentTurn];
+        var discardTile = currPlayer.GetDiscard(null);
+        currPlayer.Discard.Push(discardTile);
+
+        UpdatePlayerStatus(_currentTurn, null);
+    }
+
+    public Dictionary<AGamePlayer, Naki> GetPossibleInteruptions(out ATile lastDiscard)
     {
         if (_players.Length == 0) throw new InvalidGameState("There is no player registered, please call SetPlayers first");
 
-        var lastDiscard = _players[_currentTurn].LastDiscarded;
+        lastDiscard = _players[_currentTurn].LastDiscarded;
         if (lastDiscard == null) throw new InvalidGameState("There is no available discard on the last player");
 
         Dictionary<AGamePlayer, Naki> interuptions = [];

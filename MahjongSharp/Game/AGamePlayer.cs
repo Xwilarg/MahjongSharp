@@ -20,7 +20,7 @@ public abstract class AGamePlayer : PlayerHand
         }
         else
         {
-            Tiles.Add(newTile);
+            Tiles.Remove(newTile);
             Discard.Push(discardTile);
         }
         if (_sortAuto) SortHand();
@@ -31,9 +31,9 @@ public abstract class AGamePlayer : PlayerHand
         return Discard.Pop();
     }
 
-    public void Interupt(Naki call, IEnumerable<ATile> tiles, ATile with)
+    public void Interupt(Mentsu call, IEnumerable<ATile> tiles)
     {
-        GameClient.Interupt(this, call, tiles, with);
+        GameClient.Interupt(this, call, tiles);
     }
 
     public ATile? LastDiscarded => Discard.Count == 0 ? null : Discard.Peek();
@@ -43,7 +43,12 @@ public abstract class AGamePlayer : PlayerHand
     /// </summary>
     /// <param name="newTile">Tile we just drew, null if it's not our turn</param>
     public abstract void ShowStatus(ATile? newTile);
-    public abstract ATile GetDiscard(ATile newTile);
+    /// <summary>
+    /// Ask the player to discard a tile
+    /// </summary>
+    /// <param name="newTile">Tile that was previously drew, if the player just did a call (chii, pon, kan), it can be null</param>
+    /// <returns>Which tile we want to discard</returns>
+    public abstract ATile GetDiscard(ATile? newTile);
 
     private bool _sortAuto;
 

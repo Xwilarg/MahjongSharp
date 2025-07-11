@@ -71,6 +71,8 @@ public class PlayerHand
         var call = Calls.First(x => x.Type == Mentsu.Pon && x.Tiles.All(x => x.IsSimilarTo(with)));
         call.IsKanAdded = true;
         List<ATile> tiles = call.Tiles.ToList();
+        if (call.PlayerSource == tiles.Count) tiles.Add(with);
+        else tiles.Insert(call.PlayerSource.Value, with);
 
     }
 

@@ -56,14 +56,16 @@ internal class AIPlayer : ATextPlayer
         return (Naki.None, []);
     }
 
-    public override ATile GetDiscard(ATile newTile)
+    public override ATile GetDiscard(ATile? newTile)
     {
+        if (newTile == null) return Tiles.First();
         return newTile;
     }
 
     /// <inheritdoc/>
     public override void ShowStatus(ATile? newTile)
     {
+        Console.WriteLine();
         Console.WriteLine("========== AI     ===========");
         ShowDiscard();
         ShowCalls();
@@ -134,7 +136,7 @@ internal class HumanPlayer : ATextPlayer
         return key - '0';
     }
 
-    public override ATile GetDiscard(ATile newTile)
+    public override ATile GetDiscard(ATile? newTile)
     {
         var textNotation = TileHelper.GetTextNotation(Tiles);
 
@@ -151,10 +153,18 @@ internal class HumanPlayer : ATextPlayer
             else numPrev.Append(' ');
         }
 
-        Console.WriteLine($"{numPrev} 0");
+        List<char> acceptableInputs; 
+        if (newTile != null)
+        {
+            Console.WriteLine($"{numPrev} 0");
+            acceptableInputs = ['0', .. hintText.Take(c)];
+        }
+        else
+        {
+            Console.WriteLine($"{numPrev}");
+            acceptableInputs = hintText.Take(c).ToList();
+        }
         Console.WriteLine("Enter an index to discard");
-
-        List<char> acceptableInputs = ['0', .. hintText.Take(c)];
 
         // List of calls we can do
         var calls = GetPossibleClosedInteruptions(newTile);
@@ -220,6 +230,7 @@ internal class HumanPlayer : ATextPlayer
     /// <inheritdoc/>
     public override void ShowStatus(ATile? newTile)
     {
+        Console.WriteLine();
         Console.WriteLine("========== Player ==========");
         ShowDiscard();
         ShowCalls();
